@@ -927,6 +927,7 @@ a{ color:var(--pen-ink); }
     h.push('</div>');
     h.push('<button type="button" class="btn btn-ghost" data-act="today">Сьогодні</button>');
     if (isLocked()) h.push('<button type="button" class="btn" data-act="unlock"><span class="lockicon"></span>Розблокувати</button>');
+    else if (hasVault()) h.push('<button type="button" class="btn btn-ghost" data-act="relock" title="Прибрати пароль із цього браузера"><span class="lockicon"></span>Заблокувати</button>');
     h.push('<button type="button" class="btn' + (ui.editing ? ' btn-primary' : '') + '" data-act="toggle-edit">' +
       (ui.editing ? 'Готово' : 'Редагувати') + '</button>');
     h.push('</div></header>');
@@ -1262,7 +1263,7 @@ a{ color:var(--pen-ink); }
     h.push('</form>');
     h.push('<div class="modal-b" style="padding-top:0"><div class="fld"><label>Посилання на пари</label>' +
       '<span class="fhint">' + (hasVault() || vaultPass
-        ? 'Зашифровані паролем групи — у файлі сторінки їх немає у відкритому вигляді.'
+        ? 'Зашифровані паролем групи — у файлі сторінки їх немає у відкритому вигляді. Введений пароль лежить у цьому браузері, доки не натиснути «Заблокувати» у шапці.'
         : 'Зараз відкриті всім, хто має посилання на сторінку.') + '</span>' +
       '<button type="button" class="btn btn-sm" data-act="set-pass" style="align-self:flex-start;margin-top:6px">' +
       (hasVault() || vaultPass ? 'Змінити пароль' : 'Закрити паролем') + '</button></div></div>');
@@ -1462,6 +1463,19 @@ a{ color:var(--pen-ink); }
         }, function () { toast('Невірний пароль.', true); });
       });
     });
+  }
+
+  /* Замикає сторінку назад і прибирає пароль із цього браузера.
+     Сховище лишається недоторканим — розблокувати можна знову тим самим паролем. */
+  function relock() {
+    if (ui.dirty && !window.confirm('Є незбережені зміни — вони зникнуть. Заблокувати?')) return;
+    SECRET_FIELDS.forEach(function (f) {
+      state.lessons.forEach(function (l) { if (l.locked) l[f] = ''; });
+    });
+    vaultPass = null; unlocked = false; ui.editing = false;
+    rememberPass(''); clearDraft(); ui.dirty = false;
+    renderApp();
+    toast('Заблоковано. Пароль прибрано з цього браузера.');
   }
 
   function dropPass() {
@@ -1802,6 +1816,7 @@ a{ color:var(--pen-ink); }
       case 'save': saveAll(); break;
       case 'token': tokenModal(); break;
       case 'unlock': passModal('unlock'); break;
+      case 'relock': relock(); break;
       case 'set-pass': passModal(hasVault() || vaultPass ? 'change' : 'set'); break;
       case 'drop-pass': dropPass(); break;
       case 'forget-token': ghSetToken(''); closeModal(); renderApp(); toast('Токен видалено з цього браузера.'); break;

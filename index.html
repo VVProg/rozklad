@@ -314,6 +314,7 @@ a{ color:var(--pen-ink); }
 .bar b{ font-weight:600; }
 .bar .sp{ flex:1 1 auto; }
 .bar.warn{ border-color:var(--den-line); background:var(--den-soft); }
+.bar.fresh{ border-color:var(--pen-line); background:var(--pen-soft); }
 .bar .hint{ color:var(--ink-2); }
 
 /* ---------- modal ---------- */
@@ -942,6 +943,12 @@ a{ color:var(--pen-ink); }
 
   function banners() {
     var h = [];
+    if (ui.staleCode && !ui.editing) {
+      h.push('<div class="bar warn"><b>Ця вкладка працює на старій версії сторінки.</b>');
+      h.push('<span class="hint">Перезавантажте, щоб бачити актуальний розклад і мати змогу зберігати.</span>');
+      h.push('<span class="sp"></span><button type="button" class="btn btn-sm" data-act="reload">Перезавантажити</button></div>');
+      return h.join('');
+    }
     if (ui.editing) {
       var noKey = !artifactApi && ghEnabled() && !ghToken();
       h.push('<div class="bar' + (noKey ? ' warn' : '') + '"><b>Режим редагування</b>');
@@ -950,7 +957,9 @@ a{ color:var(--pen-ink); }
         : 'Натисніть на пару, щоб змінити, або на порожню клітинку, щоб додати.') + '</span>');
       h.push('<span class="sp"></span>');
       h.push('<button type="button" class="btn btn-sm btn-ghost" data-act="settings">Налаштування</button>');
-      if (canSave() && !ui.readOnly) {
+      if (ui.staleCode) {
+        h.push('<span class="sp"></span><button type="button" class="btn btn-sm" data-act="reload">Перезавантажити</button>');
+      } else if (canSave() && !ui.readOnly) {
         if (!artifactApi && ghEnabled()) {
           h.push('<button type="button" class="btn btn-sm btn-ghost" data-act="token">' + (ghToken() ? 'Токен ✓' : 'Токен') + '</button>');
         }
@@ -965,6 +974,14 @@ a{ color:var(--pen-ink); }
       h.push('<div class="bar"><b>Заповнено лише ' + filledDays() + ' ' + (filledDays() === 1 ? 'день' : 'дні') + ' з ' + state.days.length + '.</b>');
       h.push('<span class="hint">У вихідному документі решта тижня порожня — додайте пари через «Редагувати».</span>');
       h.push('<span class="sp"></span><button type="button" class="btn btn-sm" data-act="toggle-edit">Редагувати</button></div>');
+    } else if (ui.staleCode) {
+      h.push('<div class="bar warn"><b>Ця вкладка працює на старій версії сторінки.</b>');
+      h.push('<span class="hint">Збереження вимкнено: воно відкотило б свіжі зміни для всіх. Перезавантажте — незбережене зникне.</span>');
+      h.push('<span class="sp"></span><button type="button" class="btn btn-sm" data-act="reload">Перезавантажити</button></div>');
+    } else if (ui.stale) {
+      h.push('<div class="bar fresh"><b>Розклад оновили в іншому місці.</b>');
+      h.push('<span class="hint">Ваші зміни ще тут. Перезавантажте сторінку, коли будете готові — незбережене зникне.</span>');
+      h.push('<span class="sp"></span><button type="button" class="btn btn-sm" data-act="reload">Перезавантажити</button></div>');
     } else if (ui.dirty) {
       h.push('<div class="bar warn"><b>Є незбережені зміни.</b><span class="hint">Вони видимі лише вам, доки не збережете.</span>');
       h.push('<span class="sp"></span><button type="button" class="btn btn-sm" data-act="toggle-edit">Відкрити редактор</button></div>');
@@ -1605,12 +1622,17 @@ a{ color:var(--pen-ink); }
   }
 
   function saveAll() {
+    if (ui.staleCode) {
+      toast('Ця вкладка на старій версії сторінки — перезавантажте перед збереженням.', true);
+      return;
+    }
     if (isLocked()) { passModal('unlock'); return; }
     if (!canSave()) { toast('Збереження недоступне в цьому перегляді. Зробіть резервну копію .json.', true); return; }
     ui.saving = true; renderApp();
     try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify(state)); } catch (e) { }
     sealState().then(function (sealed) {
       var doc = buildDoc(sealed);
+      expectRaw = JSON.stringify(sealed, null, 1).replace(/</g, '\\u003c');
       if (!artifactApi && ghEnabled()) { saveToGithub(doc, false); return; }
       publishArtifact(doc);
     }, function () {
@@ -1789,6 +1811,61 @@ a{ color:var(--pen-ink); }
       buildIcs());
   }
 
+  /* ---------- свіжість даних ----------
+     GitHub Pages віддає HTML із max-age=600, тож після чужого збереження
+     браузер до десяти хвилин показує старий розклад, а відкрита вкладка —
+     взагалі до перезавантаження. Тихо перевіряємо джерело й підхоплюємо нові
+     дані, не чіпаючи код сторінки. */
+  /* Сторінка публікує власний код, тож вкладка зі старою версією при збереженні
+     відкотила б свіжі правки. Порівнюємо відбиток коду з тим, що на сервері. */
+  function hashStr(str) {
+    var h = 5381, i = str.length;
+    while (i) h = (h * 33) ^ str.charCodeAt(--i);
+    return (h >>> 0).toString(36);
+  }
+  function codeStamp(css, js) { return hashStr(css) + '.' + hashStr(js) + '.' + (css.length + js.length); }
+  var myCode = codeStamp($('#app-css').textContent, $('#app-js').textContent);
+
+  var currentRaw = ($('#app-data').textContent || '').trim();
+  var expectRaw = null;   // те, що ми щойно записали: чекаємо, доки Pages пересоберe
+  var lastCheck = 0;
+
+  function adoptData(raw) {
+    try { state = normalize(JSON.parse(raw)); } catch (e) { return; }
+    currentRaw = raw;
+    unlocked = false; vaultPass = null;
+    renderApp();
+    if (hasVault() && savedPass() && cryptoOk()) {
+      unlockWith(savedPass()).then(renderApp, function () { renderApp(); });
+    }
+    toast('Розклад оновили — показано свіжу версію.');
+  }
+
+  function checkFresh(force) {
+    if (window.claude) return;                       // в Artifact оновлення прилітає само
+    if (!/^https?:$/.test(location.protocol)) return; // локальний файл — нічого перевіряти
+    var now = Date.now();
+    if (!force && now - lastCheck < 60000) return;
+    lastCheck = now;
+    fetch(location.href, { cache: 'no-store' }).then(function (r) {
+      return r.ok ? r.text() : null;
+    }).then(function (html) {
+      if (!html) return;
+      var mc = /<style id="app-css">([\s\S]*?)<\/style>/.exec(html);
+      var mj = /<script id="app-js">([\s\S]*?)<\/script>/.exec(html);
+      if (mc && mj && codeStamp(mc[1], mj[1]) !== myCode && !ui.staleCode) {
+        ui.staleCode = true; renderApp();
+      }
+      var m = /<script id="app-data" type="application\/json">([\s\S]*?)<\/script>/.exec(html);
+      if (!m) return;
+      var raw = m[1].trim();
+      if (expectRaw) { if (raw === expectRaw) expectRaw = null; return; }
+      if (raw === currentRaw) return;
+      if (ui.dirty || ui.editing) { ui.stale = true; renderApp(); return; }
+      adoptData(raw);
+    }).catch(function () { });
+  }
+
   /* ---------- actions ---------- */
   function byId(id) { return state.lessons.filter(function (l) { return l.id === id; })[0]; }
 
@@ -1848,6 +1925,7 @@ a{ color:var(--pen-ink); }
       case 'token': tokenModal(); break;
       case 'unlock': passModal('unlock'); break;
       case 'relock': relock(); break;
+      case 'reload': clearDraft(); location.reload(); break;
       case 'set-pass': passModal(hasVault() || vaultPass ? 'change' : 'set'); break;
       case 'drop-pass': dropPass(); break;
       case 'forget-token': ghSetToken(''); closeModal(); renderApp(); toast('Токен видалено з цього браузера.'); break;
@@ -1893,7 +1971,10 @@ a{ color:var(--pen-ink); }
     }
   });
 
-  document.addEventListener('visibilitychange', function () { if (!document.hidden) tickNow(); });
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) return;
+    tickNow(); checkFresh(false);
+  });
 
   /* ---------- init ---------- */
   try {
@@ -1906,6 +1987,8 @@ a{ color:var(--pen-ink); }
 
   renderApp();
   setInterval(tickNow, 15000);
+  setTimeout(function () { checkFresh(true); }, 1200);
+  setInterval(function () { checkFresh(false); }, 300000);
 
   if (hasVault()) {
     if (!cryptoOk()) {

@@ -1663,7 +1663,34 @@ a{ color:var(--pen-ink); }
   }
 
   function importJson() {
-    textModal('Імпорт розкладу', 'Вставте раніше збережений JSON або оберіть файл. Поточний розклад буде замінено.', '', { importer: true });
+    textModal('Імпорт розкладу',
+      'Оберіть файл або вставте JSON. Файл із ключем <b>patch</b> оновлює лише перелічені пари; повний розклад (ключ <b>lessons</b>) замінює все.',
+      '', { importer: true });
+  }
+
+  /* Точкове оновлення: збігом за id, інакше за днем+парою+тижнем, інакше нове заняття. */
+  function applyPatch(items) {
+    var updated = 0, added = 0;
+    items.forEach(function (pt) {
+      if (!pt || typeof pt !== 'object') return;
+      var hit = null;
+      if (pt.id) hit = state.lessons.filter(function (l) { return l.id === pt.id; })[0];
+      if (!hit && pt.day != null && pt.slot != null) {
+        hit = state.lessons.filter(function (l) {
+          return l.day === +pt.day && l.slot === +pt.slot && l.week === (pt.week || 'both');
+        })[0];
+      }
+      if (hit) {
+        Object.keys(pt).forEach(function (k) { if (k !== 'id') hit[k] = pt[k]; });
+        updated++;
+      } else {
+        state.lessons.push(Object.assign({ id: pt.id || uid(), week: 'both' }, pt));
+        added++;
+      }
+    });
+    state = normalize(state);
+    markDirty(); closeModal(); renderApp();
+    toast('Оновлено пар: ' + updated + (added ? ', додано: ' + added : '') + '. Не забудьте зберегти.');
   }
 
   function doImport() {
@@ -1673,7 +1700,11 @@ a{ color:var(--pen-ink); }
     try { parsed = JSON.parse(ta.value); } catch (e) {
       toast('Не схоже на JSON: ' + e.message, true); return;
     }
-    if (!parsed || !Array.isArray(parsed.lessons)) { toast('У файлі немає списку занять (lessons).', true); return; }
+    if (!parsed || typeof parsed !== 'object') { toast('Не схоже на розклад.', true); return; }
+    // Імпорт наосліп стер би зашифровані посилання решти пар.
+    if (isLocked()) { toast('Спочатку розблокуйте посилання — інакше імпорт зітре їх.', true); passModal('unlock'); return; }
+    if (Array.isArray(parsed.patch)) { applyPatch(parsed.patch); return; }
+    if (!Array.isArray(parsed.lessons)) { toast('У файлі немає ні patch, ні lessons.', true); return; }
     state = normalize(parsed);
     markDirty(); closeModal(); ui.parity = null; renderApp();
     toast('Імпортовано ' + state.lessons.length + ' занять. Не забудьте зберегти.');

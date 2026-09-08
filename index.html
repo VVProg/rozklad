@@ -314,7 +314,6 @@ a{ color:var(--pen-ink); }
 .bar b{ font-weight:600; }
 .bar .sp{ flex:1 1 auto; }
 .bar.warn{ border-color:var(--den-line); background:var(--den-soft); }
-.bar.fresh{ border-color:var(--pen-line); background:var(--pen-soft); }
 .bar .hint{ color:var(--ink-2); }
 
 /* ---------- modal ---------- */
@@ -454,10 +453,10 @@ a{ color:var(--pen-ink); }
    "kind": "",
    "room": "Каф.",
    "link": "",
+   "classroom": "",
    "meetingId": "",
    "passcode": "",
    "note": "",
-   "classroom": "",
    "locked": true
   },
   {
@@ -470,10 +469,10 @@ a{ color:var(--pen-ink); }
    "kind": "",
    "room": "Каф.",
    "link": "",
+   "classroom": "",
    "meetingId": "",
    "passcode": "",
    "note": "",
-   "classroom": "",
    "locked": true
   },
   {
@@ -486,10 +485,10 @@ a{ color:var(--pen-ink); }
    "kind": "",
    "room": "Каф.",
    "link": "",
+   "classroom": "",
    "meetingId": "",
    "passcode": "",
    "note": "",
-   "classroom": "",
    "locked": true
   },
   {
@@ -502,10 +501,10 @@ a{ color:var(--pen-ink); }
    "kind": "",
    "room": "Каф.",
    "link": "",
+   "classroom": "",
    "meetingId": "",
    "passcode": "",
    "note": "",
-   "classroom": "",
    "locked": true
   },
   {
@@ -522,7 +521,7 @@ a{ color:var(--pen-ink); }
    "meetingId": "",
    "passcode": "",
    "note": "",
-   "locked": false
+   "locked": true
   },
   {
    "id": "d3",
@@ -538,7 +537,7 @@ a{ color:var(--pen-ink); }
    "meetingId": "",
    "passcode": "",
    "note": "",
-   "locked": false
+   "locked": true
   },
   {
    "id": "d2",
@@ -554,7 +553,7 @@ a{ color:var(--pen-ink); }
    "meetingId": "",
    "passcode": "",
    "note": "",
-   "locked": false
+   "locked": true
   },
   {
    "id": "d4",
@@ -570,7 +569,7 @@ a{ color:var(--pen-ink); }
    "meetingId": "",
    "passcode": "",
    "note": "",
-   "locked": false
+   "locked": true
   },
   {
    "id": "b1",
@@ -618,7 +617,7 @@ a{ color:var(--pen-ink); }
    "meetingId": "",
    "passcode": "",
    "note": "",
-   "locked": false
+   "locked": true
   },
   {
    "id": "b4",
@@ -705,9 +704,9 @@ a{ color:var(--pen-ink); }
   "v": 1,
   "kdf": "PBKDF2-SHA256",
   "iter": 250000,
-  "salt": "XL36iAKyUGCRHu1tyEDKGw==",
-  "iv": "Gzx+w4LX9TOKGe+O",
-  "ct": "wH/XzLXGeAmDLH9ZNT8kDFwuFhONrcOaegMr56HEWSCHhQVKCpdhwCQRjxcciB7dVl2Lk6bX/BvI5p1udga8EUquubmLog4zET3BR/r2ojuGFroIID2srUxX5YLESAWuW8S5leLKN7z7nUmC96Pvt/v7HgYkdFyQOwFepi+B8femzIYwmV0qGVu8EGu6AGvSC0+y8Et2b9KdQtTjUTDN8CbKr8AOTH+LR18Z3Tc+EnVKJj5CnbEaBEotY9tkiOrNeWJ0LNrT9vulCEp3dFUp3ntEjz5DeLRG4zPsNlMANSB+S4DPagtiym8yUl5/HQ8rS7dnZ2skOztcyEa+hcJSqYXrMJCNZirxlE8FmSHFnzNme3gTponXpeusDiiRDtQ01EUUZTGt/I1UhkxqzqOBQ96CIYsIR8JXXlM2FJmJDnZN0E1cjZ4uEtGCDTjdfFPL3GU7REuphy5b54Yf23eNHzyx3ltbkVexqbCJ7EKd/8BwNp7RTBr9R0MO6s2EF5D/OyFflEEscxfsrqXO/HkMYL7gy7kH0NQ4POSS6tw7rbH+1KqvZk4nD7qVfIZTdRz/gspR1T+IHfj+9O/Ns74RYutXykTmcdP27cCOgUUcRm02SgEAYuxHItNe03yl9qK/4MWdqMjRww4uBuctMUnMs7+BdCOXJJRcoyy0w6G3e2XgY4ocBISYlMUT+4GRaTgN+hH0bVOqLcx/FSD3UHdaAKOv3GEnsPVVWG0eN/3SD2OrdXn8+w1akBGouob91sN0ORJfDVEPM5vTInqHWwECTJy8/zYHdGlW9xxbmSHJ+bBhk7T2maQmjCnEGeHIaIiDqMd0NmuPrnYolOWYkWdA4NPUmAlT03WpucHJMKuK9nEAMc4MxO9Y0RzQPoipKk5rlG9Vi9l8R69/ugiI80HQLMNliKQQQEEjhMy1joE+jHuEb9gOHQag4RI47z/xlG6uN8ukylpa/dqsUn3uF8Ggi3qbMztXQV3BvDuCCpi11cRulvY5yvL0aL0qu2XptC0Gx/7Fi4P6dMzIyyJFMluygjZYSNU33oJdkTO0LYi075wJjCNZfFBlTeAG+jSQ/d67bSESpgpQBtjnWkEum+p1JSC/0r0JlQnyzJfVNmnjSUrqbQbxmt+Pkzd2HnIUan7/9UfngdJrGoxzZGj08nwuorgNMoGvzsVJ1Zlj4HCl5zT2eY+0qqhybdoG3op+Jb/PXTpPNijrv8uly9OsHFyAAjcWXTFA72ot7XCHBAyjMJmgsOK2KiVkXN9quULZCXC+39Vu7Y0uapiAS7icwkwL+EhZfHx9FOrz4nSqKl7l2IgtoJ2Pt1AypCMGcMk9VZJoGjX+Cp5RX+Sy1/3PO9C4gchYhIc9QPZ6YtTRZ5pWw+5flx0C/rzVBVE8jPTbnhFyhgKDIGZnIxu3Q6mvSQ8A56XvbKoHygX0ZFCjPe5iS/nTDtDOurcHHxQnBGaASIopH8rBQGPHWsBRh+7Uc6Nk"
+  "salt": "Wk/zenvBRKClZtHFgCalKw==",
+  "iv": "5fRcRK9TE4EW5u+L",
+  "ct": "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"
  }
 }
 </script>
@@ -966,10 +965,6 @@ a{ color:var(--pen-ink); }
       h.push('<div class="bar"><b>Заповнено лише ' + filledDays() + ' ' + (filledDays() === 1 ? 'день' : 'дні') + ' з ' + state.days.length + '.</b>');
       h.push('<span class="hint">У вихідному документі решта тижня порожня — додайте пари через «Редагувати».</span>');
       h.push('<span class="sp"></span><button type="button" class="btn btn-sm" data-act="toggle-edit">Редагувати</button></div>');
-    } else if (ui.stale) {
-      h.push('<div class="bar fresh"><b>Розклад оновили в іншому місці.</b>');
-      h.push('<span class="hint">Ваші зміни ще тут. Перезавантажте сторінку, коли будете готові — незбережене зникне.</span>');
-      h.push('<span class="sp"></span><button type="button" class="btn btn-sm" data-act="reload">Перезавантажити</button></div>');
     } else if (ui.dirty) {
       h.push('<div class="bar warn"><b>Є незбережені зміни.</b><span class="hint">Вони видимі лише вам, доки не збережете.</span>');
       h.push('<span class="sp"></span><button type="button" class="btn btn-sm" data-act="toggle-edit">Відкрити редактор</button></div>');
@@ -1616,7 +1611,6 @@ a{ color:var(--pen-ink); }
     try { sessionStorage.setItem(DRAFT_KEY, JSON.stringify(state)); } catch (e) { }
     sealState().then(function (sealed) {
       var doc = buildDoc(sealed);
-      expectRaw = JSON.stringify(sealed, null, 1).replace(/</g, '\\u003c');
       if (!artifactApi && ghEnabled()) { saveToGithub(doc, false); return; }
       publishArtifact(doc);
     }, function () {
@@ -1795,46 +1789,6 @@ a{ color:var(--pen-ink); }
       buildIcs());
   }
 
-  /* ---------- свіжість даних ----------
-     GitHub Pages віддає HTML із max-age=600, тож після чужого збереження
-     браузер до десяти хвилин показує старий розклад, а відкрита вкладка —
-     взагалі до перезавантаження. Тихо перевіряємо джерело й підхоплюємо нові
-     дані, не чіпаючи код сторінки. */
-  var currentRaw = ($('#app-data').textContent || '').trim();
-  var expectRaw = null;   // те, що ми щойно записали: чекаємо, доки Pages пересоберe
-  var lastCheck = 0;
-
-  function adoptData(raw) {
-    try { state = normalize(JSON.parse(raw)); } catch (e) { return; }
-    currentRaw = raw;
-    unlocked = false; vaultPass = null;
-    renderApp();
-    if (hasVault() && savedPass() && cryptoOk()) {
-      unlockWith(savedPass()).then(renderApp, function () { renderApp(); });
-    }
-    toast('Розклад оновили — показано свіжу версію.');
-  }
-
-  function checkFresh(force) {
-    if (window.claude) return;                       // в Artifact оновлення прилітає само
-    if (!/^https?:$/.test(location.protocol)) return; // локальний файл — нічого перевіряти
-    var now = Date.now();
-    if (!force && now - lastCheck < 60000) return;
-    lastCheck = now;
-    fetch(location.href, { cache: 'no-store' }).then(function (r) {
-      return r.ok ? r.text() : null;
-    }).then(function (html) {
-      if (!html) return;
-      var m = /<script id="app-data" type="application\/json">([\s\S]*?)<\/script>/.exec(html);
-      if (!m) return;
-      var raw = m[1].trim();
-      if (expectRaw) { if (raw === expectRaw) expectRaw = null; return; }
-      if (raw === currentRaw) return;
-      if (ui.dirty || ui.editing) { ui.stale = true; renderApp(); return; }
-      adoptData(raw);
-    }).catch(function () { });
-  }
-
   /* ---------- actions ---------- */
   function byId(id) { return state.lessons.filter(function (l) { return l.id === id; })[0]; }
 
@@ -1894,7 +1848,6 @@ a{ color:var(--pen-ink); }
       case 'token': tokenModal(); break;
       case 'unlock': passModal('unlock'); break;
       case 'relock': relock(); break;
-      case 'reload': clearDraft(); location.reload(); break;
       case 'set-pass': passModal(hasVault() || vaultPass ? 'change' : 'set'); break;
       case 'drop-pass': dropPass(); break;
       case 'forget-token': ghSetToken(''); closeModal(); renderApp(); toast('Токен видалено з цього браузера.'); break;
@@ -1940,10 +1893,7 @@ a{ color:var(--pen-ink); }
     }
   });
 
-  document.addEventListener('visibilitychange', function () {
-    if (document.hidden) return;
-    tickNow(); checkFresh(false);
-  });
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) tickNow(); });
 
   /* ---------- init ---------- */
   try {
@@ -1956,8 +1906,6 @@ a{ color:var(--pen-ink); }
 
   renderApp();
   setInterval(tickNow, 15000);
-  setTimeout(function () { checkFresh(true); }, 1200);
-  setInterval(function () { checkFresh(false); }, 300000);
 
   if (hasVault()) {
     if (!cryptoOk()) {

@@ -1088,11 +1088,15 @@ a{ color:var(--pen-ink); }
       h.push('<div class="ls-act"><button type="button" class="copy lock" data-act="unlock"><span class="lockicon"></span>Посилання</button></div>');
     } else if (!ui.editing && (l.link || l.classroom || l.meetingId || l.passcode)) {
       h.push('<div class="ls-act">');
-      if (l.link) h.push('<a class="join" href="' + esc(l.link) + '" target="_blank" rel="noopener noreferrer">Приєднатися</a>');
-      if (isUrl(l.classroom)) h.push('<a class="join alt" href="' + esc(l.classroom) + '" target="_blank" rel="noopener noreferrer">Classroom</a>');
+      if (l.link) h.push('<a class="join" href="' + esc(l.link) + '" target="_blank" rel="noopener noreferrer" title="Відкрити конференцію Zoom">' +
+        (o.compact ? 'Zoom' : 'Приєднатися в Zoom') + '</a>');
+      if (isUrl(l.classroom)) h.push('<a class="join alt" href="' + esc(l.classroom) + '" target="_blank" rel="noopener noreferrer" title="Відкрити курс у Google Classroom">Classroom</a>');
       else if (l.classroom) h.push('<button type="button" class="copy" data-act="copy" data-val="' + esc(l.classroom) + '" title="Скопіювати код класу Google Classroom">Клас</button>');
-      if (l.meetingId) h.push('<button type="button" class="copy" data-act="copy" data-val="' + esc(l.meetingId.replace(/\s/g, '')) + '" title="Скопіювати ID конференції">ID</button>');
-      if (l.passcode) h.push('<button type="button" class="copy" data-act="copy" data-val="' + esc(l.passcode) + '" title="Скопіювати код доступу">Код</button>');
+      // Посилання вже містить пароль, тож у тісній сітці реквізити приховані:
+      // вони потрібні лише для входу з застосунку Zoom або якщо посилання загубилось.
+      var creds = !o.compact || !l.link;
+      if (creds && l.meetingId) h.push('<button type="button" class="copy" data-act="copy" data-val="' + esc(l.meetingId.replace(/\s/g, '')) + '" title="Скопіювати ідентифікатор конференції Zoom">ID конференції</button>');
+      if (creds && l.passcode) h.push('<button type="button" class="copy" data-act="copy" data-val="' + esc(l.passcode) + '" title="Скопіювати код доступу до конференції Zoom">Код доступу</button>');
       h.push('</div>');
     }
     if (o.now) h.push('<div class="ls-progress" style="width:' + Math.round(o.progress * 100) + '%"></div>');
@@ -1147,7 +1151,7 @@ a{ color:var(--pen-ink); }
       h.push('<span class="now-main">' + esc(info.lesson.subject) + '</span>');
       h.push('<span class="now-meta"><span class="mono">' + esc(info.slot.start) + '–' + esc(info.slot.end) + '</span> · лишилось ' + humanMin(left) + '</span>');
       if (info.lesson.locked && isLocked()) h.push('<button type="button" class="btn btn-sm now-join" data-act="unlock"><span class="lockicon"></span>Розблокувати</button>');
-      else if (primaryLink(info.lesson)) h.push('<a class="join now-join" href="' + esc(primaryLink(info.lesson)) + '" target="_blank" rel="noopener noreferrer">' + (info.lesson.link ? 'Приєднатися' : 'Classroom') + '</a>');
+      else if (primaryLink(info.lesson)) h.push('<a class="join now-join" href="' + esc(primaryLink(info.lesson)) + '" target="_blank" rel="noopener noreferrer">' + (info.lesson.link ? 'Приєднатися в Zoom' : 'Classroom') + '</a>');
       h.push(clock);
       h.push('<div class="now-bar" style="width:' + Math.round(info.progress * 100) + '%"></div>');
       return h.join('');
@@ -1159,7 +1163,7 @@ a{ color:var(--pen-ink); }
       h.push('<span class="now-main">' + esc(n.lesson.subject) + '</span>');
       h.push('<span class="now-meta">' + when + ' о <span class="mono">' + esc(n.slot.start) + '</span>' +
         (n.mins < 600 ? ' · через ' + humanMin(n.mins) : '') + '</span>');
-      if (n.offset === 0 && n.mins <= 20 && primaryLink(n.lesson)) h.push('<a class="join now-join" href="' + esc(primaryLink(n.lesson)) + '" target="_blank" rel="noopener noreferrer">' + (n.lesson.link ? 'Приєднатися' : 'Classroom') + '</a>');
+      if (n.offset === 0 && n.mins <= 20 && primaryLink(n.lesson)) h.push('<a class="join now-join" href="' + esc(primaryLink(n.lesson)) + '" target="_blank" rel="noopener noreferrer">' + (n.lesson.link ? 'Приєднатися в Zoom' : 'Classroom') + '</a>');
       h.push(clock);
       return h.join('');
     }

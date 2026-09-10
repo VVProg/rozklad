@@ -766,7 +766,8 @@ a{ color:var(--pen-ink); }
     if (i > 0) return { pre: str.slice(0, i).trim(), main: str.slice(i + 3).trim() };
     return { pre: '', main: String(str || '') };
   }
-  function primaryLink(l) { return l.link || l.classroom || ''; }
+  function isUrl(v) { return /^https?:\/\//i.test(String(v || '')); }
+  function primaryLink(l) { return l.link || (isUrl(l.classroom) ? l.classroom : '') || ''; }
   function shortName(full) {
     var p = String(full || '').trim().split(/\s+/);
     if (p.length < 2) return p[0] || '';
@@ -1088,7 +1089,8 @@ a{ color:var(--pen-ink); }
     } else if (!ui.editing && (l.link || l.classroom || l.meetingId || l.passcode)) {
       h.push('<div class="ls-act">');
       if (l.link) h.push('<a class="join" href="' + esc(l.link) + '" target="_blank" rel="noopener noreferrer">Приєднатися</a>');
-      if (l.classroom) h.push('<a class="join alt" href="' + esc(l.classroom) + '" target="_blank" rel="noopener noreferrer">Classroom</a>');
+      if (isUrl(l.classroom)) h.push('<a class="join alt" href="' + esc(l.classroom) + '" target="_blank" rel="noopener noreferrer">Classroom</a>');
+      else if (l.classroom) h.push('<button type="button" class="copy" data-act="copy" data-val="' + esc(l.classroom) + '" title="Скопіювати код класу Google Classroom">Клас</button>');
       if (l.meetingId) h.push('<button type="button" class="copy" data-act="copy" data-val="' + esc(l.meetingId.replace(/\s/g, '')) + '" title="Скопіювати ID конференції">ID</button>');
       if (l.passcode) h.push('<button type="button" class="copy" data-act="copy" data-val="' + esc(l.passcode) + '" title="Скопіювати код доступу">Код</button>');
       h.push('</div>');
@@ -1216,7 +1218,7 @@ a{ color:var(--pen-ink); }
     h.push('<div class="fld"><label for="f-room">Аудиторія</label><input id="f-room" name="room" value="' + esc(l.room) + '" placeholder="напр. Каф. або 312"></div>');
     h.push('</div>');
     h.push('<div class="fld"><label for="f-link">Посилання на конференцію</label><input id="f-link" name="link" class="mono" value="' + esc(l.link) + '" placeholder="https://…" inputmode="url"></div>');
-    h.push('<div class="fld"><label for="f-cr">Google Classroom</label><input id="f-cr" name="classroom" class="mono" value="' + esc(l.classroom) + '" placeholder="https://classroom.google.com/…" inputmode="url"></div>');
+    h.push('<div class="fld"><label for="f-cr">Google Classroom</label><input id="f-cr" name="classroom" class="mono" value="' + esc(l.classroom) + '" placeholder="посилання або код класу"></div>');
     h.push('<div class="row2">');
     h.push('<div class="fld"><label for="f-mid">ID конференції</label><input id="f-mid" name="meetingId" class="mono" value="' + esc(l.meetingId) + '"></div>');
     h.push('<div class="fld"><label for="f-pass">Код доступу</label><input id="f-pass" name="passcode" class="mono" value="' + esc(l.passcode) + '"></div>');
@@ -1784,7 +1786,7 @@ a{ color:var(--pen-ink); }
       if (l.kind) desc.push(l.kind);
       if (l.week !== 'both') desc.push(WEEK_LABEL[l.week]);
       if (l.link) desc.push(l.link);
-      if (l.classroom) desc.push('Classroom: ' + l.classroom);
+      if (l.classroom) desc.push(isUrl(l.classroom) ? 'Classroom: ' + l.classroom : 'Код класу Classroom: ' + l.classroom);
       if (l.meetingId) desc.push('ID: ' + l.meetingId);
       if (l.passcode) desc.push('Код: ' + l.passcode);
       if (l.note) desc.push(l.note);
